@@ -7,12 +7,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
-  <link rel="icon" href="favicon.ico" type="image/x-icon">
 </head>
 <body>
   <div class="theme-toggle">
     <label>
-      <input type="checkbox" id="theme-checkbox">
+      <input type="checkbox" id="theme-toggle">
       <span class="material-symbols-outlined">dark_mode</span>
     </label>
   </div>
@@ -32,7 +31,8 @@
       </div>
     </form>
 
-    <iframe id="player" style="display:none; width:100%; aspect-ratio:16/9; margin-top:20px;"></iframe>
+    <div id="status" class="status-message"></div>
+    <iframe id="player"></iframe>
   </main>
 
   <footer>
@@ -41,104 +41,81 @@
   </footer>
 
   <script>
-    // Your friend's exact functions implemented as-is
-    function setThemeFromPreference() {
-      const saved = localStorage.getItem("theme");
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const theme = saved || (prefersDark ? "dark" : "light");
-      document.documentElement.setAttribute("data-theme", theme);
-      document.getElementById("theme-checkbox").checked = theme === "dark";
-    }
+    // Theme handling
+    const themeToggle = document.getElementById('theme-toggle');
+    themeToggle.checked = localStorage.getItem('theme') === 'dark';
+    document.documentElement.setAttribute('data-theme', themeToggle.checked ? 'dark' : 'light');
+    
+    themeToggle.onchange = () => {
+      const theme = themeToggle.checked ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+    };
 
-    function toggleTheme() {
-      const isDark = document.getElementById("theme-checkbox").checked;
-      const newTheme = isDark ? "dark" : "light";
-      document.documentElement.setAttribute("data-theme", newTheme);
-      localStorage.setItem("theme", newTheme);
-    }
+    // Elements
+    const statusElement = document.getElementById('status');
+    const player = document.getElementById('player');
+    player.style.display = 'none';
 
-    function purify(key) {
-      document.querySelector('.iframe').style.display = 'block';
-      document.querySelector('iframe').setAttribute('src', 'https://www.youtube-nocookie.com/embed/' + key);
-    }
-
-    function init() {
-      setThemeFromPreference();
-      const params = new URLSearchParams(window.location.search.substr(1));
-      if (params.has('v')) {
-        const match = params.get('v').match(/(http:|https:)?(\/\/)?(www\.)?(youtube.com|youtu.be)\/(watch|embed)?(\?v=|\/)?([\w-]+)/);
-        if (match && match[7]) purify(match[7]);
-      }
-    }
-
-    // Original event listeners
-    document.getElementById('theme-checkbox').onchange = toggleTheme;
-
+    // Button handlers
     document.getElementById('watch-btn').addEventListener('click', () => {
       const url = document.getElementById('yt-url').value;
-      const match = url.match(/(http:|https:)?(\/\/)?(www\.)?(youtube.com|youtu.be)\/(watch|embed)?(\?v=|\/)?([\w-]+)/);
-      if (match && match[7]) {
-        purify(match[7]);
-        history.pushState({}, '', `?v=${url}`);
-      } else {
-        alert('Invalid YouTube URL');
-      }
+      const videoId = extractVideoId(url);
+      if (!videoId) return showError('Invalid YouTube URL');
+      
+      player.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&modestbranding=1`;
+      player.style.display = 'block';
+      statusElement.style.display = 'none';
     });
 
     document.getElementById('mp3-btn').addEventListener('click', async () => {
-      const url = document.getElementById('yt-url').value;
-      const videoId = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})/)?.[1];
-      if (!videoId) return alert('Invalid YouTube URL');
-      
-      const btn = document.getElementById('mp3-btn');
-      btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Downloading...';
-      
-      try {
-        const proxyUrl = `https://ytmp3tomp4.giorgisapharidze1809.workers.dev/?url=${videoId}&format=mp3`;
-        const response = await fetch(proxyUrl);
-        const blob = await response.blob();
-        const downloadUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = `CleanTube-${videoId}.mp3`;
-        a.click();
-      } catch (error) {
-        alert('Download failed. Please try another video.');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'MP3';
-      }
+      await downloadMedia('mp3');
     });
 
     document.getElementById('mp4-btn').addEventListener('click', async () => {
+      await downloadMedia('mp4');
+    });
+
+    // Core functions
+    function extractVideoId(url) {
+      const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
+      return match ? match[1] : null;
+    }
+
+    async function downloadMedia(format) {
       const url = document.getElementById('yt-url').value;
-      const videoId = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})/)?.[1];
-      if (!videoId) return alert('Invalid YouTube URL');
+      const videoId = extractVideoId(url);
+      if (!videoId) return showError('Invalid YouTube URL');
       
-      const btn = document.getElementById('mp4-btn');
+      const btn = document.getElementById(`${format}-btn`);
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Downloading...';
       
       try {
-        const proxyUrl = `https://ytmp3tomp4.giorgisapharidze1809.workers.dev/?url=${videoId}&format=mp4`;
+        const proxyUrl = `https://ytmp3tomp4.giorgisapharidze1809.workers.dev/?url=${videoId}&format=${format}`;
         const response = await fetch(proxyUrl);
+        
+        if (!response.ok) throw new Error('Download failed');
+        
         const blob = await response.blob();
         const downloadUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = downloadUrl;
-        a.download = `CleanTube-${videoId}.mp4`;
+        a.download = `CleanTube-${videoId}.${format}`;
         a.click();
       } catch (error) {
-        alert('Download failed. Please try another video.');
+        showError('Download failed. Please try another video.');
       } finally {
         btn.disabled = false;
-        btn.textContent = 'MP4';
+        btn.textContent = format.toUpperCase();
       }
-    });
+    }
 
-    // Initialize
-    window.onload = init;
+    function showError(message) {
+      statusElement.textContent = message;
+      statusElement.style.display = 'block';
+      statusElement.style.color = '#ff0000';
+    }
   </script>
 </body>
 </html>
