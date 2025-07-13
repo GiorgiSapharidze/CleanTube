@@ -84,27 +84,35 @@
 
     async function downloadMedia(format) {
       const url = document.getElementById('yt-url').value;
-      const videoId = extractVideoId(url);
-      if (!videoId) return showError('Invalid YouTube URL');
-      
       const btn = document.getElementById(`${format}-btn`);
+      
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Downloading...';
       
       try {
-        const proxyUrl = `https://ytmp3tomp4.giorgisapharidze1809.workers.dev/?url=${videoId}&format=${format}`;
-        const response = await fetch(proxyUrl);
-        
-        if (!response.ok) throw new Error('Download failed');
-        
-        const blob = await response.blob();
-        const downloadUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = `CleanTube-${videoId}.${format}`;
-        a.click();
+        const workerUrl = `https://ytmp3tomp4.giorgisapharidze1809.workers.dev/?url=${encodeURIComponent(url)}&format=${format}`;
+        const response = await fetch(workerUrl);
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message || 'Download failed');
+        }
+
+        // Handle both direct downloads and redirects
+        if (response.headers.get('content-type')?.includes('application/json')) {
+          const data = await response.json();
+          window.open(data.downloadUrl, '_blank');
+        } else {
+          const blob = await response.blob();
+          const downloadUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = downloadUrl;
+          a.download = `CleanTube-${new Date().getTime()}.${format}`;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(downloadUrl), 100);
+        }
       } catch (error) {
-        showError('Download failed. Please try another video.');
+        showError(error.message);
       } finally {
         btn.disabled = false;
         btn.textContent = format.toUpperCase();
