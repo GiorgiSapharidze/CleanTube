@@ -96,28 +96,38 @@
       showStatus('Finding best download source...');
 
       try {
-        // Generate download URL through worker
         const workerUrl = `https://ytmp3tomp4.giorgisapharidze1809.workers.dev/?url=${encodeURIComponent(url)}&format=${format}`;
         
         // First check if worker is available
-        const healthCheck = await fetch(workerUrl, { method: 'HEAD' });
-        if (!healthCheck.ok) throw new Error('Service unavailable');
-
-        // Open download in new tab (works for most browsers)
-        const downloadTab = window.open(workerUrl, '_blank');
-        
-        // Fallback for popup blockers
-        if (!downloadTab) {
-          showStatus('Please allow popups or click here to download');
-          const fallbackLink = document.createElement('a');
-          fallbackLink.href = workerUrl;
-          fallbackLink.target = '_blank';
-          fallbackLink.textContent = 'Click to download';
-          fallbackLink.style.color = 'var(--primary)';
-          fallbackLink.style.fontWeight = 'bold';
-          statusElement.innerHTML = '';
-          statusElement.appendChild(fallbackLink);
+        const testResponse = await fetch(workerUrl, { method: 'HEAD' });
+        if (!testResponse.ok) {
+          throw new Error('Download service is currently unavailable');
         }
+
+        // Create hidden iframe for download
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = workerUrl;
+        document.body.appendChild(iframe);
+        
+        // Set timeout to check if download started
+        let downloadStarted = false;
+        const timeout = setTimeout(() => {
+          if (!downloadStarted) {
+            showStatus('Opening download page...');
+            window.open(workerUrl, '_blank');
+          }
+        }, 3000);
+
+        // Clean up after download
+        iframe.onload = () => {
+          downloadStarted = true;
+          clearTimeout(timeout);
+          setTimeout(() => {
+            document.body.removeChild(iframe);
+            showStatus('Download started!');
+          }, 5000);
+        };
 
       } catch (error) {
         showError(error.message || 'Download failed. Please try again later.');
