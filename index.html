@@ -4,25 +4,33 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>CleanTube - YouTube Downloader</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
   <style>
     :root {
-      --bg-light: #f9fafb;
-      --text-light: #111827;
-      --bg-dark: #111827;
-      --text-dark: #f3f4f6;
-      --primary: #3b82f6;
-      --primary-light: #ffffff;
-      --primary-dark: #093a8a;
-      --input-bg: #fff;
-      --input-border: #d1d5db;
-      --radius: 8px;
-      --transition: all 0.3s ease;
+      --bg-light: #ffffff;
+      --bg-secondary-light: #f8fafc;
+      --text-light: #0f172a;
+      --text-secondary-light: #64748b;
+      --bg-dark: #0f172a;
+      --bg-secondary-dark: #1e293b;
+      --text-dark: #f1f5f9;
+      --text-secondary-dark: #94a3b8;
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-light: #a5b4fc;
       --success: #10b981;
+      --success-hover: #059669;
       --error: #ef4444;
       --warning: #f59e0b;
+      --border-light: #e2e8f0;
+      --border-dark: #334155;
+      --shadow-light: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      --shadow-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --shadow-large: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --radius: 12px;
+      --radius-small: 8px;
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     [data-theme="light"] {
@@ -33,114 +41,61 @@
     [data-theme="dark"] {
       background: var(--bg-dark);
       color: var(--text-dark);
-      --input-bg: #374151;
-      --input-border: #4b5563;
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
     }
 
     body {
-      padding: 2rem;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
       min-height: 100vh;
       transition: var(--transition);
       display: flex;
       flex-direction: column;
+      padding: 1rem;
     }
 
-    header, main, footer {
-      max-width: 720px;
+    .container {
+      max-width: 640px;
       margin: 0 auto;
       width: 100%;
-    }
-
-    header {
-      margin-bottom: 2rem;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-      color: var(--primary);
-    }
-
-    h2 {
-      font-weight: 400;
-      color: gray;
-      margin-bottom: 2rem;
-    }
-
-    #main-form {
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      margin-bottom: 2rem;
+      gap: 2rem;
     }
 
-    input[type="url"] {
-      padding: 1rem;
-      border-radius: var(--radius);
-      border: 1px solid var(--input-border);
-      background: var(--input-bg);
-      width: 100%;
-      font-size: 1rem;
-      transition: var(--transition);
-      color: var(--text-light);
+    /* Header */
+    header {
+      text-align: center;
+      padding: 2rem 0;
     }
 
-    [data-theme="dark"] input[type="url"] {
-      color: var(--text-dark);
+    .logo {
+      font-size: clamp(2rem, 5vw, 3rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--primary), var(--primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.5rem;
     }
 
-    .button-group {
-      display: flex;
-      gap: 0.75rem;
-      width: 100%;
+    .subtitle {
+      font-size: 1.125rem;
+      font-weight: 400;
+      color: var(--text-secondary-light);
+      margin-bottom: 0;
     }
 
-    .button-group button {
-      flex: 1;
-      padding: 1rem;
-      background: var(--primary);
-      color: white;
-      border: none;
-      border-radius: var(--radius);
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      min-height: 48px;
+    [data-theme="dark"] .subtitle {
+      color: var(--text-secondary-dark);
     }
 
-    .button-group button:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
-    }
-
-    .button-group button:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    #player {
-      width: 100%;
-      aspect-ratio: 16/9;
-      border: none;
-      border-radius: var(--radius);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      display: none;
-      margin-top: 1.5rem;
-    }
-
+    /* Theme Toggle */
     .theme-toggle {
       position: fixed;
       top: 1.5rem;
@@ -151,95 +106,258 @@
     .theme-toggle label {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      justify-content: center;
+      width: 48px;
+      height: 48px;
       cursor: pointer;
-      padding: 0.5rem;
       border-radius: 50%;
-      background: var(--primary-light);
+      background: var(--bg-secondary-light);
+      border: 1px solid var(--border-light);
       transition: var(--transition);
+      box-shadow: var(--shadow-light);
+    }
+
+    [data-theme="dark"] .theme-toggle label {
+      background: var(--bg-secondary-dark);
+      border-color: var(--border-dark);
+    }
+
+    .theme-toggle label:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-medium);
     }
 
     .theme-toggle input {
       display: none;
     }
 
-    .material-symbols-outlined {
-      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    .theme-toggle .material-symbols-outlined {
       color: var(--primary);
+      font-size: 20px;
     }
 
-    .spinner {
-      display: inline-block;
-      width: 1.25rem;
-      height: 1.25rem;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
+    /* Main Form */
+    .main-form {
+      background: var(--bg-secondary-light);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow-light);
+      transition: var(--transition);
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    [data-theme="dark"] .main-form {
+      background: var(--bg-secondary-dark);
+      border-color: var(--border-dark);
     }
 
+    .input-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .url-input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      border: 2px solid var(--border-light);
+      border-radius: var(--radius);
+      background: var(--bg-light);
+      color: var(--text-light);
+      font-size: 1rem;
+      font-weight: 400;
+      transition: var(--transition);
+      outline: none;
+    }
+
+    [data-theme="dark"] .url-input {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      border-color: var(--border-dark);
+    }
+
+    .url-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .url-input::placeholder {
+      color: var(--text-secondary-light);
+    }
+
+    [data-theme="dark"] .url-input::placeholder {
+      color: var(--text-secondary-dark);
+    }
+
+    /* Button Group */
+    .button-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      width: 100%;
+    }
+
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem 1.5rem;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      min-height: 52px;
+      outline: none;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .btn:hover::before {
+      left: 100%;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: var(--shadow-medium);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-large);
+    }
+
+    .btn-secondary {
+      background: var(--bg-light);
+      color: var(--text-light);
+      border: 2px solid var(--border-light);
+    }
+
+    [data-theme="dark"] .btn-secondary {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+      border-color: var(--border-dark);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn:disabled::before {
+      display: none;
+    }
+
+    /* Status Messages */
     .status-message {
-      text-align: center;
-      margin-top: 1rem;
       padding: 1rem;
       border-radius: var(--radius);
       font-weight: 500;
       display: none;
+      margin-top: 1rem;
+      border: 1px solid transparent;
     }
 
     .status-message.info {
-      background: rgba(59, 130, 246, 0.1);
+      background: rgba(99, 102, 241, 0.1);
       color: var(--primary);
-      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-color: rgba(99, 102, 241, 0.2);
     }
 
     .status-message.success {
       background: rgba(16, 185, 129, 0.1);
       color: var(--success);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-color: rgba(16, 185, 129, 0.2);
     }
 
     .status-message.error {
       background: rgba(239, 68, 68, 0.1);
       color: var(--error);
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-color: rgba(239, 68, 68, 0.2);
     }
 
     .status-message.warning {
       background: rgba(245, 158, 11, 0.1);
       color: var(--warning);
-      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-color: rgba(245, 158, 11, 0.2);
     }
 
-    .download-section {
+    /* Video Player */
+    .player-container {
       margin-top: 2rem;
-      padding: 1.5rem;
-      background: var(--input-bg);
       border-radius: var(--radius);
-      border: 1px solid var(--input-border);
+      overflow: hidden;
+      box-shadow: var(--shadow-large);
       display: none;
+    }
+
+    .video-player {
+      width: 100%;
+      aspect-ratio: 16/9;
+      border: none;
+    }
+
+    /* Download Section */
+    .download-section {
+      background: var(--bg-secondary-light);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow-light);
+      display: none;
+      margin-top: 2rem;
+    }
+
+    [data-theme="dark"] .download-section {
+      background: var(--bg-secondary-dark);
+      border-color: var(--border-dark);
     }
 
     .video-info {
       display: flex;
       gap: 1rem;
-      margin-bottom: 1rem;
+      margin-bottom: 2rem;
     }
 
     .video-thumbnail {
       width: 120px;
       height: 90px;
-      border-radius: var(--radius);
+      border-radius: var(--radius-small);
       object-fit: cover;
+      box-shadow: var(--shadow-light);
     }
 
     .video-details h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
       margin-bottom: 0.5rem;
       color: var(--text-light);
+      line-height: 1.4;
     }
 
     [data-theme="dark"] .video-details h3 {
@@ -247,34 +365,46 @@
     }
 
     .video-details p {
-      color: gray;
+      color: var(--text-secondary-light);
       font-size: 0.875rem;
+      margin-bottom: 0.25rem;
+    }
+
+    [data-theme="dark"] .video-details p {
+      color: var(--text-secondary-dark);
     }
 
     .format-options {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 1rem;
-      margin-top: 1rem;
+      margin-bottom: 2rem;
     }
 
     .format-option {
-      padding: 1rem;
-      border: 1px solid var(--input-border);
+      padding: 1.5rem;
+      border: 2px solid var(--border-light);
       border-radius: var(--radius);
       cursor: pointer;
       transition: var(--transition);
       text-align: center;
+      background: var(--bg-light);
+    }
+
+    [data-theme="dark"] .format-option {
+      background: var(--bg-dark);
+      border-color: var(--border-dark);
     }
 
     .format-option:hover {
       border-color: var(--primary);
-      background: rgba(59, 130, 246, 0.05);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-medium);
     }
 
     .format-option.selected {
       border-color: var(--primary);
-      background: rgba(59, 130, 246, 0.1);
+      background: rgba(99, 102, 241, 0.05);
     }
 
     .format-title {
@@ -289,84 +419,133 @@
 
     .format-details {
       font-size: 0.875rem;
-      color: gray;
+      color: var(--text-secondary-light);
+    }
+
+    [data-theme="dark"] .format-details {
+      color: var(--text-secondary-dark);
     }
 
     .download-btn {
       width: 100%;
-      padding: 1rem;
       background: var(--success);
       color: white;
-      border: none;
-      border-radius: var(--radius);
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--transition);
-      margin-top: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
     }
 
     .download-btn:hover {
-      opacity: 0.9;
-      transform: translateY(-1px);
+      background: var(--success-hover);
     }
 
-    .download-btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-      transform: none;
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 1.25rem;
+      height: 1.25rem;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s linear infinite;
     }
 
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Footer */
     footer {
       margin-top: auto;
-      padding-top: 2rem;
+      padding: 2rem 0;
       text-align: center;
       font-size: 0.875rem;
-      color: gray;
+      color: var(--text-secondary-light);
     }
 
+    [data-theme="dark"] footer {
+      color: var(--text-secondary-dark);
+    }
+
+    /* Mobile Responsive */
     @media (max-width: 768px) {
       body {
+        padding: 1rem;
+      }
+
+      .container {
+        gap: 1.5rem;
+      }
+
+      header {
+        padding: 1.5rem 0;
+      }
+
+      .main-form {
         padding: 1.5rem;
       }
-      
-      h1 {
-        font-size: 2rem;
-      }
-      
+
       .button-group {
-        flex-direction: column;
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
       }
 
       .video-info {
         flex-direction: column;
         text-align: center;
+        align-items: center;
+      }
+
+      .video-thumbnail {
+        width: 160px;
+        height: 120px;
       }
 
       .format-options {
         grid-template-columns: 1fr;
       }
+
+      .download-section {
+        padding: 1.5rem;
+      }
     }
 
     @media (max-width: 480px) {
-      body {
-        padding: 1rem;
-      }
-      
       .theme-toggle {
         top: 1rem;
         right: 1rem;
       }
-      
-      input[type="url"] {
-        padding: 0.75rem;
+
+      .theme-toggle label {
+        width: 44px;
+        height: 44px;
+      }
+
+      .main-form {
+        padding: 1.25rem;
+      }
+
+      .url-input {
+        padding: 0.875rem 1rem;
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+
+      .btn {
+        padding: 0.875rem 1.25rem;
+        min-height: 48px;
+      }
+
+      .video-thumbnail {
+        width: 140px;
+        height: 105px;
+      }
+    }
+
+    /* Improved touch targets */
+    @media (pointer: coarse) {
+      .btn {
+        min-height: 48px;
       }
       
-      .button-group button {
-        padding: 0.75rem;
+      .format-option {
+        min-height: 80px;
       }
     }
   </style>
@@ -379,69 +558,79 @@
     </label>
   </div>
 
-  <header>
-    <h1>CleanTube</h1>
-    <h2>Watch and download YouTube videos</h2>
-  </header>
+  <div class="container">
+    <header>
+      <h1 class="logo">CleanTube</h1>
+      <p class="subtitle">Watch and download YouTube videos</p>
+    </header>
 
-  <main>
-    <form id="main-form">
-      <input type="url" id="yt-url" placeholder="Paste YouTube URL" required>
-      <div class="button-group">
-        <button type="button" id="watch-btn">
-          <span class="material-symbols-outlined">play_arrow</span>
-          Watch
-        </button>
-        <button type="button" id="info-btn">
-          <span class="material-symbols-outlined">info</span>
-          Get Info
-        </button>
-      </div>
-    </form>
-
-    <div id="status" class="status-message"></div>
-    <iframe id="player"></iframe>
-    
-    <div id="download-section" class="download-section">
-      <div class="video-info">
-        <img id="video-thumbnail" class="video-thumbnail" alt="Video thumbnail">
-        <div class="video-details">
-          <h3 id="video-title"></h3>
-          <p id="video-duration"></p>
-          <p id="video-channel"></p>
+    <main>
+      <div class="main-form">
+        <div class="input-group">
+          <div class="input-wrapper">
+            <input type="url" id="yt-url" class="url-input" placeholder="Paste YouTube URL here..." required>
+          </div>
         </div>
+        
+        <div class="button-group">
+          <button type="button" id="watch-btn" class="btn btn-primary">
+            <span class="material-symbols-outlined">play_arrow</span>
+            Watch
+          </button>
+          <button type="button" id="info-btn" class="btn btn-secondary">
+            <span class="material-symbols-outlined">info</span>
+            Get Info
+          </button>
+        </div>
+      </div>
+
+      <div id="status" class="status-message"></div>
+      
+      <div class="player-container">
+        <iframe id="player" class="video-player"></iframe>
       </div>
       
-      <div class="format-options">
-        <div class="format-option selected" data-format="mp3" data-quality="128">
-          <div class="format-title">MP3 Audio</div>
-          <div class="format-details">128 kbps • Small file size</div>
+      <div id="download-section" class="download-section">
+        <div class="video-info">
+          <img id="video-thumbnail" class="video-thumbnail" alt="Video thumbnail">
+          <div class="video-details">
+            <h3 id="video-title"></h3>
+            <p id="video-duration"></p>
+            <p id="video-channel"></p>
+          </div>
         </div>
-        <div class="format-option" data-format="mp3" data-quality="320">
-          <div class="format-title">MP3 Audio HD</div>
-          <div class="format-details">320 kbps • High quality</div>
+        
+        <div class="format-options">
+          <div class="format-option selected" data-format="mp3" data-quality="128">
+            <div class="format-title">MP3 Audio</div>
+            <div class="format-details">128 kbps • Small file size</div>
+          </div>
+          <div class="format-option" data-format="mp3" data-quality="320">
+            <div class="format-title">MP3 Audio HD</div>
+            <div class="format-details">320 kbps • High quality</div>
+          </div>
+          <div class="format-option" data-format="mp4" data-quality="720">
+            <div class="format-title">MP4 Video</div>
+            <div class="format-details">720p • HD quality</div>
+          </div>
+          <div class="format-option" data-format="mp4" data-quality="1080">
+            <div class="format-title">MP4 Video HD</div>
+            <div class="format-details">1080p • Full HD</div>
+          </div>
         </div>
-        <div class="format-option" data-format="mp4" data-quality="720">
-          <div class="format-title">MP4 Video</div>
-          <div class="format-details">720p • HD quality</div>
-        </div>
-        <div class="format-option" data-format="mp4" data-quality="1080">
-          <div class="format-title">MP4 Video HD</div>
-          <div class="format-details">1080p • Full HD</div>
-        </div>
+        
+        <button id="download-btn" class="btn download-btn">
+          <span class="material-symbols-outlined">download</span>
+          Download
+        </button>
       </div>
-      
-      <button id="download-btn" class="download-btn">
-        <span class="material-symbols-outlined">download</span>
-        Download
-      </button>
-    </div>
-  </main>
+    </main>
 
-  <footer>
-    <p>This site uses YouTube's embed API with "nocookie" mode. No data is stored.</p>
-    <p>Made with ❤️ by Giorgi Sapharidze</p>
-  </footer>
+    <footer>
+      <p>This site uses YouTube's embed API with "nocookie" mode. No data is stored.</p>
+      <p>Made with ❤️ by Giorgi Sapharidze</p>
+    </footer>
+  </div>
 
   <script>
     // Configuration - Update this with your Vercel deployment URL
@@ -464,13 +653,12 @@
 
     // Elements
     const statusElement = document.getElementById('status');
+    const playerContainer = document.querySelector('.player-container');
     const player = document.getElementById('player');
     const urlInput = document.getElementById('yt-url');
     const downloadSection = document.getElementById('download-section');
     const downloadBtn = document.getElementById('download-btn');
     
-    player.style.display = 'none';
-
     // Button handlers
     document.getElementById('watch-btn').addEventListener('click', () => {
       const url = urlInput.value.trim();
@@ -487,11 +675,11 @@
       
       currentVideoId = videoId;
       player.src = `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0`;
-      player.style.display = 'block';
+      playerContainer.style.display = 'block';
       statusElement.style.display = 'none';
       
       // Scroll to player
-      player.scrollIntoView({ behavior: 'smooth' });
+      playerContainer.scrollIntoView({ behavior: 'smooth' });
     });
 
     document.getElementById('info-btn').addEventListener('click', async () => {
