@@ -1,0 +1,10 @@
+{
+  "functions": {
+    "api/video-info.js": {
+      "runtime": "nodejs18.x"
+    },
+    "api/download.js": {
+      "runtime": "nodejs18.x"
+    }
+  }
+}
