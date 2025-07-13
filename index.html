@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CleanTube - YouTube Downloader</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+  <div class="theme-toggle">
+    <label>
+      <input type="checkbox" id="theme-checkbox">
+      <span class="material-symbols-outlined">dark_mode</span>
+    </label>
+  </div>
+
+  <header>
+    <h1>CleanTube</h1>
+    <h2>Watch and download YouTube videos</h2>
+  </header>
+
+  <main>
+    <form id="main-form">
+      <input type="url" id="yt-url" placeholder="Paste YouTube URL" required>
+      <div class="button-group">
+        <button type="button" id="watch-btn">Watch</button>
+        <button type="button" id="mp3-btn">MP3</button>
+        <button type="button" id="mp4-btn">MP4</button>
+      </div>
+    </form>
+
+    <iframe id="player" style="display:none; width:100%; aspect-ratio:16/9; margin-top:20px;"></iframe>
+  </main>
+
+  <footer>
+    <p>This site uses YouTube's embed API with "nocookie" mode. No data is stored.</p>
+    <p>Made with ❤️ by Giorgi Sapharidze</p>
+  </footer>
+
+  <script>
+    // Your friend's exact functions implemented as-is
+    function setThemeFromPreference() {
+      const saved = localStorage.getItem("theme");
+      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const theme = saved || (prefersDark ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+      document.getElementById("theme-checkbox").checked = theme === "dark";
+    }
+
+    function toggleTheme() {
+      const isDark = document.getElementById("theme-checkbox").checked;
+      const newTheme = isDark ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+    }
+
+    function purify(key) {
+      document.querySelector('.iframe').style.display = 'block';
+      document.querySelector('iframe').setAttribute('src', 'https://www.youtube-nocookie.com/embed/' + key);
+    }
+
+    function init() {
+      setThemeFromPreference();
+      const params = new URLSearchParams(window.location.search.substr(1));
+      if (params.has('v')) {
+        const match = params.get('v').match(/(http:|https:)?(\/\/)?(www\.)?(youtube.com|youtu.be)\/(watch|embed)?(\?v=|\/)?([\w-]+)/);
+        if (match && match[7]) purify(match[7]);
+      }
+    }
+
+    // Original event listeners
+    document.getElementById('theme-checkbox').onchange = toggleTheme;
+
+    document.getElementById('watch-btn').addEventListener('click', () => {
+      const url = document.getElementById('yt-url').value;
+      const match = url.match(/(http:|https:)?(\/\/)?(www\.)?(youtube.com|youtu.be)\/(watch|embed)?(\?v=|\/)?([\w-]+)/);
+      if (match && match[7]) {
+        purify(match[7]);
+        history.pushState({}, '', `?v=${url}`);
+      } else {
+        alert('Invalid YouTube URL');
+      }
+    });
+
+    document.getElementById('mp3-btn').addEventListener('click', async () => {
+      const url = document.getElementById('yt-url').value;
+      const videoId = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})/)?.[1];
+      if (!videoId) return alert('Invalid YouTube URL');
+      
+      const btn = document.getElementById('mp3-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Downloading...';
+      
+      try {
+        const proxyUrl = `https://ytmp3tomp4.giorgisapharidze1809.workers.dev/?url=${videoId}&format=mp3`;
+        const response = await fetch(proxyUrl);
+        const blob = await response.blob();
+        const downloadUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `CleanTube-${videoId}.mp3`;
+        a.click();
+      } catch (error) {
+        alert('Download failed. Please try another video.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'MP3';
+      }
+    });
+
+    document.getElementById('mp4-btn').addEventListener('click', async () => {
+      const url = document.getElementById('yt-url').value;
+      const videoId = url.match(/(?:v=|\/)([a-zA-Z0-9_-]{11})/)?.[1];
+      if (!videoId) return alert('Invalid YouTube URL');
+      
+      const btn = document.getElementById('mp4-btn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Downloading...';
+      
+      try {
+        const proxyUrl = `https://ytmp3tomp4.giorgisapharidze1809.workers.dev/?url=${videoId}&format=mp4`;
+        const response = await fetch(proxyUrl);
+        const blob = await response.blob();
+        const downloadUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `CleanTube-${videoId}.mp4`;
+        a.click();
+      } catch (error) {
+        alert('Download failed. Please try another video.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'MP4';
+      }
+    });
+
+    // Initialize
+    window.onload = init;
+  </script>
+</body>
+</html>
