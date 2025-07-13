@@ -598,6 +598,10 @@
       </div>
       
       <div id="download-section" class="download-section">
+        <button id="close-info-btn" class="btn btn-secondary" style="float: right; margin-bottom: 1rem;">
+          <span class="material-symbols-outlined">close</span>
+          Close
+        </button>
         <div class="video-info">
           <img id="video-thumbnail" class="video-thumbnail" alt="Video thumbnail">
           <div class="video-details">
@@ -783,6 +787,9 @@
     }
 
     function displayVideoInfo(info) {
+      document.getElementById('close-info-btn').addEventListener('click', () => {
+        downloadSection.style.display = 'none';
+      });
       document.getElementById('video-thumbnail').src = info.thumbnail;
       document.getElementById('video-title').textContent = info.title;
       document.getElementById('video-duration').textContent = `Duration: ${info.duration}`;
