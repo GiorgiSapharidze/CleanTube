@@ -19,8 +19,8 @@
       --primary: #6366f1;
       --primary-hover: #4f46e5;
       --primary-light: #a5b4fc;
-      --success: #6366f1;
-      --success-hover: #4f46e5;
+      --success: #10b981;
+      --success-hover: #059669;
       --error: #ef4444;
       --warning: #f59e0b;
       --border-light: #e2e8f0;
@@ -333,21 +333,6 @@
       margin-top: 2rem;
     }
 
-    .download-wrapper {
-    transition: max-height 0.4s ease, padding 0.3s ease;
-    overflow: hidden;
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    }
-
-    .download-wrapper.open {
-      max-height: 1000px; /* large enough to fit content */
-      padding-top: 2rem;
-      padding-bottom: 2rem;
-    }
-
-
     [data-theme="dark"] .download-section {
       background: var(--bg-secondary-dark);
       border-color: var(--border-dark);
@@ -612,44 +597,40 @@
 
       </div>
       
-      <!-- ADD INSIDE <body> WHERE .download-section USED TO BE -->
-      <div id="download-wrapper" class="download-wrapper">
-        <div id="download-section" class="download-section">
-          <div class="video-info">
-            <img id="video-thumbnail" class="video-thumbnail" alt="Video thumbnail">
-            <div class="video-details">
-              <h3 id="video-title"></h3>
-              <p id="video-duration"></p>
-              <p id="video-channel"></p>
-            </div>
+      <div id="download-section" class="download-section">
+        <div class="video-info">
+          <img id="video-thumbnail" class="video-thumbnail" alt="Video thumbnail">
+          <div class="video-details">
+            <h3 id="video-title"></h3>
+            <p id="video-duration"></p>
+            <p id="video-channel"></p>
           </div>
-          
-          <div class="format-options">
-            <div class="format-option selected" data-format="mp3" data-quality="128">
-              <div class="format-title">MP3 Audio</div>
-              <div class="format-details">128 kbps • Small file size</div>
-            </div>
-            <div class="format-option" data-format="mp3" data-quality="320">
-              <div class="format-title">MP3 Audio HD</div>
-              <div class="format-details">320 kbps • High quality</div>
-            </div>
-            <div class="format-option" data-format="mp4" data-quality="720">
-              <div class="format-title">MP4 Video</div>
-              <div class="format-details">720p • HD quality</div>
-            </div>
-            <div class="format-option" data-format="mp4" data-quality="1080">
-              <div class="format-title">MP4 Video HD</div>
-              <div class="format-details">1080p • Full HD</div>
-            </div>
-          </div>
-          
-          <button id="download-btn" class="btn download-btn">
-            <span class="material-symbols-outlined">download</span>
-            Download
-          </button>
         </div>
+        
+        <div class="format-options">
+          <div class="format-option selected" data-format="mp3" data-quality="128">
+            <div class="format-title">MP3 Audio</div>
+            <div class="format-details">128 kbps • Small file size</div>
+          </div>
+          <div class="format-option" data-format="mp3" data-quality="320">
+            <div class="format-title">MP3 Audio HD</div>
+            <div class="format-details">320 kbps • High quality</div>
+          </div>
+          <div class="format-option" data-format="mp4" data-quality="720">
+            <div class="format-title">MP4 Video</div>
+            <div class="format-details">720p • HD quality</div>
+          </div>
+          <div class="format-option" data-format="mp4" data-quality="1080">
+            <div class="format-title">MP4 Video HD</div>
+            <div class="format-details">1080p • Full HD</div>
+          </div>
+        </div>
+        
+        <button id="download-btn" class="btn download-btn">
+          <span class="material-symbols-outlined">download</span>
+          Download
+        </button>
       </div>
-
     </main>
 
     <footer>
@@ -806,20 +787,10 @@
       document.getElementById('video-title').textContent = info.title;
       document.getElementById('video-duration').textContent = `Duration: ${info.duration}`;
       document.getElementById('video-channel').textContent = `Channel: ${info.channel}`;
-
-      const wrapper = document.getElementById('download-wrapper');
-      const infoBtn = document.getElementById('info-btn');
-
-      wrapper.classList.toggle('open');
-
-      if (wrapper.classList.contains('open')) {
-        infoBtn.innerHTML = `<span class="material-symbols-outlined">close</span> Hide Info`;
-        wrapper.scrollIntoView({ behavior: 'smooth' });
-      } else {
-        infoBtn.innerHTML = `<span class="material-symbols-outlined">info</span> Get Info`;
-      }
+      
+      downloadSection.style.display = 'block';
+      downloadSection.scrollIntoView({ behavior: 'smooth' });
     }
-
 
     async function downloadVideo(videoId, format) {
       downloadBtn.disabled = true;
