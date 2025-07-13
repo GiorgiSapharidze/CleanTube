@@ -86,33 +86,44 @@
       const url = document.getElementById('yt-url').value;
       const btn = document.getElementById(`${format}-btn`);
       
+      if (!url) {
+        showError('Please enter a YouTube URL');
+        return;
+      }
+
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span> Downloading...';
-      
+      showStatus('Preparing download...');
+
       try {
         const workerUrl = `https://ytmp3tomp4.giorgisapharidze1809.workers.dev/?url=${encodeURIComponent(url)}&format=${format}`;
         const response = await fetch(workerUrl);
 
         if (!response.ok) {
           const error = await response.json();
-          throw new Error(error.message || 'Download failed');
+          throw new Error(error.message || 'Download service unavailable');
         }
 
-        // Handle both direct downloads and redirects
-        if (response.headers.get('content-type')?.includes('application/json')) {
-          const data = await response.json();
-          window.open(data.downloadUrl, '_blank');
-        } else {
-          const blob = await response.blob();
-          const downloadUrl = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = downloadUrl;
-          a.download = `CleanTube-${new Date().getTime()}.${format}`;
-          a.click();
-          setTimeout(() => URL.revokeObjectURL(downloadUrl), 100);
-        }
+        // Create download link
+        const blob = await response.blob();
+        const downloadUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `CleanTube-${new Date().getTime()}.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        
+        // Clean up
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(downloadUrl);
+        }, 100);
+
+        showStatus('Download started!');
+
       } catch (error) {
-        showError(error.message);
+        showError(error.message || 'Download failed. Please try again later.');
+        console.error('Download error:', error);
       } finally {
         btn.disabled = false;
         btn.textContent = format.toUpperCase();
