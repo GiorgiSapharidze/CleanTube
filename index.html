@@ -92,44 +92,43 @@
       }
 
       btn.disabled = true;
-      btn.innerHTML = '<span class="spinner"></span> Downloading...';
-      showStatus('Preparing download...');
+      btn.innerHTML = '<span class="spinner"></span> Processing...';
+      showStatus('Finding best download source...');
 
       try {
+        // Generate download URL through worker
         const workerUrl = `https://ytmp3tomp4.giorgisapharidze1809.workers.dev/?url=${encodeURIComponent(url)}&format=${format}`;
-        const response = await fetch(workerUrl);
-
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.message || 'Download service unavailable');
-        }
-
-        // Create download link
-        const blob = await response.blob();
-        const downloadUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = `CleanTube-${new Date().getTime()}.${format}`;
-        document.body.appendChild(a);
-        a.click();
         
-        // Clean up
-        setTimeout(() => {
-          document.body.removeChild(a);
-          URL.revokeObjectURL(downloadUrl);
-        }, 100);
+        // First check if worker is available
+        const healthCheck = await fetch(workerUrl, { method: 'HEAD' });
+        if (!healthCheck.ok) throw new Error('Service unavailable');
 
-        showStatus('Download started!');
+        // Open download in new tab (works for most browsers)
+        const downloadTab = window.open(workerUrl, '_blank');
+        
+        // Fallback for popup blockers
+        if (!downloadTab) {
+          showStatus('Please allow popups or click here to download');
+          const fallbackLink = document.createElement('a');
+          fallbackLink.href = workerUrl;
+          fallbackLink.target = '_blank';
+          fallbackLink.textContent = 'Click to download';
+          fallbackLink.style.color = 'var(--primary)';
+          fallbackLink.style.fontWeight = 'bold';
+          statusElement.innerHTML = '';
+          statusElement.appendChild(fallbackLink);
+        }
 
       } catch (error) {
         showError(error.message || 'Download failed. Please try again later.');
         console.error('Download error:', error);
       } finally {
-        btn.disabled = false;
-        btn.textContent = format.toUpperCase();
+        setTimeout(() => {
+          btn.disabled = false;
+          btn.textContent = format.toUpperCase();
+        }, 2000);
       }
     }
-
     function showError(message) {
       statusElement.textContent = message;
       statusElement.style.display = 'block';
